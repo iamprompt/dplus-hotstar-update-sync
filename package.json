@@ -1,0 +1,27 @@
+{
+  "name": "dplus-hotstar-update-sync",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/iamprompt/dplus-hotstar-update-sync.git",
+  "author": "Supakarn Laorattanakul <wearedprompt@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config-ts": "^0.13.1",
+    "@types/node": "^16.11.12",
+    "dotenv": "^10.0.0",
+    "eslint": "^8.4.1",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.3"
+  },
+  "dependencies": {
+    "@types/fs-extra": "^9.0.13",
+    "axios": "^0.24.0",
+    "dayjs": "^1.10.7",
+    "fs-extra": "^10.0.0"
+  }
+}

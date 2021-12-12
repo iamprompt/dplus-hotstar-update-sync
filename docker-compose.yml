@@ -1,0 +1,7 @@
+version: '3.9' # optional since v1.27.0
+services:
+  dplus-update:
+    build:
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data

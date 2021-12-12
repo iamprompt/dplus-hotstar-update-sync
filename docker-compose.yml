@@ -1,4 +1,4 @@
-version: '3.9' # optional since v1.27.0
+version: '3.9'
 services:
   dplus-update:
     build:
@@ -6,4 +6,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - /volume1/docker/dplus-hs-sync:/app/data
+    environment:
+      - AIRTABLE_API_KEY=${AIRTABLE_API_KEY}
+      - AIRTABLE_WORKING_BASE=${AIRTABLE_WORKING_BASE}
+    network_mode: 'host'
     restart: always

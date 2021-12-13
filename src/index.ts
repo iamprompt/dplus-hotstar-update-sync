@@ -111,7 +111,7 @@ const updatePoststoAirtable = async (assets: ATHotstar[]) => {
 }
 
 const formatHotstarData = (item: AssetItem): ATHotstar => {
-  if (!['MOVIE', 'SHOW', 'EPISODE', 'CLIP'].includes(item.entityType || item.assetType)) {
+  if (!['MOVIE', 'SHOW', 'CLIP'].includes(item.entityType || item.assetType)) {
     // console.log(item)
     return undefined
   }
@@ -141,7 +141,7 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
     Description: item.description,
     Title: item.title,
     EngTitle: item.engTitle,
-    EntityType: item.entityType,
+    EntityType: item.entityType ?? item.assetType,
     Encrypted: item.encrypted,
     StartDate: item.startDate ? dayjs(item.startDate * 1000).toDate() : undefined,
     EndDate: item.endDate ? dayjs(item.endDate * 1000).toDate() : undefined,
@@ -206,8 +206,8 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
     if (iFormat)
       ASSETS[item.contentId] = iFormat
 
-    if (['MOVIE', 'SHOW'].includes(item.entityType)) {
-      console.log(`Fetching Hotstar content ${item.contentId}...`)
+    if (['SHOW'].includes(item.entityType)) {
+      console.log(`Fetching Hotstar Show ID: ${item.contentId}...`)
       try {
         const {
           data: {

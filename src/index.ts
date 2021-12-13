@@ -118,8 +118,12 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
   const ImagesUrl: Set<string> = new Set()
   const Images: Partial<AttachmentImg>[] = []
 
+  const originalImages = []
+  item.images && originalImages.push(...Object.values(item.images))
+  item.imageSets?.DEFAULT && originalImages.push(...Object.values(item.imageSets.DEFAULT))
+
   // Unique image urls
-  for (const image of [...Object.values(item.images), ...Object.values(item.imageSets.DEFAULT)]) {
+  for (const image of originalImages) {
     const url = `https://img1.hotstarext.com/image/upload/f_auto/${image}`
     ImagesUrl.add(url)
   }
@@ -166,6 +170,7 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
 }
 
 ;(async () => {
+  console.log('=== Syncing Hotstar data ===')
   // STEP 1: Get assets cache file from disk
   try {
     OLD_ASSET = readJSONSync(ASSETS_FILE, { encoding: 'utf8' })
@@ -180,6 +185,7 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
   // console.log(OLD_ASSET, ASSETS_PAIR)
 
   // STEP 2: Get search assets from Hotstar
+  console.log('Fetching Hotstar data...')
   const {
     data: {
       body: {
@@ -194,12 +200,14 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
   })
 
   // STEP 3: Format assets from Hotstar to Airtable format
+  console.log('Formatting Hotstar data...')
   for (const item of items) {
     const iFormat = formatHotstarData(item)
     if (iFormat)
       ASSETS[item.contentId] = iFormat
 
     if (['MOVIE', 'SHOW'].includes(item.entityType)) {
+      console.log(`Fetching Hotstar content ${item.contentId}...`)
       const {
         data: {
           body: {
@@ -235,6 +243,7 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
   writeFileSync(ASSETS_FILE, JSON.stringify(ASSETS, null, 2), { encoding: 'utf8' })
 
   // STEP 4: Compare assets cache file with new assets
+  console.log('Updating Airtable data...')
   const AssetsToCreate = Object.entries(ASSETS).reduce((acc, [key, value]) => {
     // Basic Compare
     if (!OLD_ASSET[key]) {

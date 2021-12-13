@@ -5,6 +5,7 @@ import type { IMAGE_PAIR } from '../@types/file'
 export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const isObjectEqual = (a: any, b: any) => {
+  if (!a || !b) return false
   // Ignore properties that are undefined in both objects
   const aProps = Object.keys(a).filter((key) => a[key] !== undefined)
   const bProps = Object.keys(b).filter((key) => b[key] !== undefined)

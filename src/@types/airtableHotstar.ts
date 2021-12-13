@@ -41,8 +41,14 @@ export type ATHotstar = {
   Images: Partial<AttachmentImg>[]
   Studio: string
   ContentProvider: string
-  Parent: string
+  TrailerParent: string[]
   EpisodeCount: number
+  SeasonCount: number
+  ClipCount: number
+  SeasonNo: number
+  EpisodeNo: number
+  ShowParent: string[]
+  SeasonName: string
   LiveStartTime: Date
   BroadcastDate: Date
   Description: string

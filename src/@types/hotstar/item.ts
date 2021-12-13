@@ -1,20 +1,4 @@
-export type HotstarSearch = {
-  body: {
-    results: {
-      items: SearchItem[]
-      totalResults: number
-      offset: number
-      size: number
-      responseType: string
-      totalPageResults: number
-      totalPages: number
-    }
-  }
-  statusCode: string
-  statusCodeValue: number
-}
-
-export type SearchItem = {
+export type AssetItem = {
   title: string
   engTitle?: string
   contentId: number
@@ -76,6 +60,15 @@ export type SearchItem = {
   liveStartTime?: number
   trailerParents?: string[]
   broadCastDate?: number
+  seasonCnt?: number
+  clipCnt?: number
+  seasonNo?: number
+  episodeNo?: number
+  showName?: string
+  showId?: number
+  showContentId?: string
+  showShortTitle?: string
+  seasonName?: string
 }
 
 export type AutoplayObj = {

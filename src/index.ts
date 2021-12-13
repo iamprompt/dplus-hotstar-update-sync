@@ -208,34 +208,38 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
 
     if (['MOVIE', 'SHOW'].includes(item.entityType)) {
       console.log(`Fetching Hotstar content ${item.contentId}...`)
-      const {
-        data: {
-          body: {
-            results: { item: it, trays },
+      try {
+        const {
+          data: {
+            body: {
+              results: { item: it, trays },
+            },
           },
-        },
-      } = await hotstarAPIInstance.get<HotstarResponse<DetailResult>>(`/o/v1/${item.entityType.toLowerCase()}/detail`, {
-        params: {
-          contentId: item.contentId,
-          size: 1000,
-          offset: 0,
-          tao: 0,
-          tas: 1000,
-        }
-      })
+        } = await hotstarAPIInstance.get<HotstarResponse<DetailResult>>(`/o/v1/${item.entityType.toLowerCase()}/detail`, {
+          params: {
+            contentId: item.contentId,
+            size: 1000,
+            offset: 0,
+            tao: 0,
+            tas: 1000,
+          }
+        })
 
-      const jFormat = formatHotstarData(it)
-      if (jFormat)
-        ASSETS[it.contentId] = jFormat
+        const jFormat = formatHotstarData(it)
+        if (jFormat)
+          ASSETS[it.contentId] = jFormat
 
-      for (const tray of Object.values(trays.items)) {
-        if (tray.assets && tray.assets.items) {
-          for (const trayItem of tray.assets?.items) {
-            const kFormat = formatHotstarData(trayItem)
-            if (kFormat)
-              ASSETS[trayItem.contentId] = kFormat
+        for (const tray of Object.values(trays.items)) {
+          if (tray.assets && tray.assets.items) {
+            for (const trayItem of tray.assets?.items) {
+              const kFormat = formatHotstarData(trayItem)
+              if (kFormat)
+                ASSETS[trayItem.contentId] = kFormat
+            }
           }
         }
+      } catch (err) {
+        if (axios.isAxiosError(err)) console.error(err.response.data)
       }
     }
   }

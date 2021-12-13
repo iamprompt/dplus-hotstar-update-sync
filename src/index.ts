@@ -160,7 +160,7 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
     ClipCount: item.clipCnt,
     SeasonNo: item.seasonNo,
     EpisodeNo: item.episodeNo,
-    ShowParent: [ASSETS_PAIR[item.showContentId]?.recordId] ?? [],
+    ShowParent: ASSETS_PAIR[item.showContentId] ? [ASSETS_PAIR[item.showContentId].recordId] : [],
     SeasonName: item.seasonName,
     EpisodeCount: item.episodeCnt,
     LiveStartTime: item.liveStartTime ? dayjs(item.liveStartTime * 1000).toDate() : undefined,
@@ -206,42 +206,42 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
     if (iFormat)
       ASSETS[item.contentId] = iFormat
 
-    if (['SHOW'].includes(item.entityType)) {
-      console.log(`Fetching Hotstar Show ID: ${item.contentId}...`)
-      try {
-        const {
-          data: {
-            body: {
-              results: { item: it, trays },
-            },
-          },
-        } = await hotstarAPIInstance.get<HotstarResponse<DetailResult>>(`/o/v1/${item.entityType.toLowerCase()}/detail`, {
-          params: {
-            contentId: item.contentId,
-            size: 1000,
-            offset: 0,
-            tao: 0,
-            tas: 1000,
-          }
-        })
+    // if (['SHOW'].includes(item.entityType)) {
+    //   console.log(`Fetching Hotstar Show ID: ${item.contentId}...`)
+    //   try {
+    //     const {
+    //       data: {
+    //         body: {
+    //           results: { item: it, trays },
+    //         },
+    //       },
+    //     } = await hotstarAPIInstance.get<HotstarResponse<DetailResult>>(`/o/v1/${item.entityType.toLowerCase()}/detail`, {
+    //       params: {
+    //         contentId: item.contentId,
+    //         size: 1000,
+    //         offset: 0,
+    //         tao: 0,
+    //         tas: 1000,
+    //       }
+    //     })
 
-        const jFormat = formatHotstarData(it)
-        if (jFormat)
-          ASSETS[it.contentId] = jFormat
+    //     const jFormat = formatHotstarData(it)
+    //     if (jFormat)
+    //       ASSETS[it.contentId] = jFormat
 
-        for (const tray of Object.values(trays.items)) {
-          if (tray.assets && tray.assets.items) {
-            for (const trayItem of tray.assets?.items) {
-              const kFormat = formatHotstarData(trayItem)
-              if (kFormat)
-                ASSETS[trayItem.contentId] = kFormat
-            }
-          }
-        }
-      } catch (err) {
-        if (axios.isAxiosError(err)) console.error(err.response.data)
-      }
-    }
+    //     for (const tray of Object.values(trays.items)) {
+    //       if (tray.assets && tray.assets.items) {
+    //         for (const trayItem of tray.assets?.items) {
+    //           const kFormat = formatHotstarData(trayItem)
+    //           if (kFormat)
+    //             ASSETS[trayItem.contentId] = kFormat
+    //         }
+    //       }
+    //     }
+    //   } catch (err) {
+    //     if (axios.isAxiosError(err)) console.error(err.response.data)
+    //   }
+    // }
   }
 
   writeFileSync(ASSETS_FILE, JSON.stringify(ASSETS, null, 2), { encoding: 'utf8' })

@@ -6,17 +6,19 @@ import type { ATHotstar, AttachmentImg, Records } from './@types/airtableHotstar
 import { AirtableAPI } from './utils/airtable'
 import { hotstarAPIInstance } from './utils/hotstar'
 import { delay, ImagePairing, isObjectEqual } from './utils'
-import type { ASSETS_AIRTABLE_PAIR_JSON, ASSETS_JSON, IMAGE_PAIR } from './@types/file'
+import type { ASSETS_AIRTABLE_PAIR_JSON, ASSETS_JSON, IMAGE_PAIR, SYNC_CONFIG } from './@types/file'
 import type { AssetItem } from './@types/hotstar/item'
 import type { DetailResult, HotstarResponse, SearchResult } from './@types/hotstar/response'
 
 const DATA_DIR = './data'
 const ASSETS_FILE = `${DATA_DIR}/assets.json`
 const ASSETS_PAIR_FILE = `${DATA_DIR}/assetsAirtable.json`
+const CONFIG_FILE = `${DATA_DIR}/config.json`
 
 let OLD_ASSET: ASSETS_JSON = {}
 const ASSETS: ASSETS_JSON = {}
 let ASSETS_PAIR: ASSETS_AIRTABLE_PAIR_JSON = {}
+const CONFIG: SYNC_CONFIG = {}
 
 const getAssetsAirtable = async () => {
   const assets: ASSETS_JSON = {}
@@ -171,6 +173,14 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
 
 ;(async () => {
   console.log('=== Syncing Hotstar data ===')
+  // try {
+  //   console.log('- Reading Config File')
+  //   CONFIG = readJSONSync(CONFIG_FILE, { encoding: 'utf8' })
+  // } catch (err) {
+  //   console.error('!! [ERROR] reading config file')
+  //   process.exit(1)
+  // }
+
   // STEP 1: Get assets cache file from disk
   try {
     OLD_ASSET = readJSONSync(ASSETS_FILE, { encoding: 'utf8' })
@@ -267,7 +277,13 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
   if (Object.keys(ASSETS_PAIR).length > 0) {
     const UpdatedAssets = Object.entries(ASSETS).reduce((acc, [key, value]) => {
       if (OLD_ASSET[key] && !isObjectEqual(OLD_ASSET[key], value)) {
-        value.Images = ImagePairing(ASSETS_PAIR[key].images, value.Images)
+        const oldImages = ImagePairing(ASSETS_PAIR[key].images, OLD_ASSET[key].Images)
+        const newImages = Object.entries(ImagePairing(ASSETS_PAIR[key].images, value.Images)).reduce((acc, [key, value]) => {
+          if (!oldImages[key]) acc[key] = value
+          return acc
+        }, Object.values(oldImages) as Partial<AttachmentImg>[])
+
+        value.Images = newImages
         acc[key] = value
       }
       return acc

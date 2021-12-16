@@ -5,4 +5,7 @@ COPY . .
 RUN yarn
 RUN yarn build
 ENV TZ Asia/Bangkok
+ENV AIRTABLE_API_KEY API_KEY_HERE
+ENV AIRTABLE_WORKING_BASE BASE_ID_HERE
+
 CMD ["yarn", "start"]

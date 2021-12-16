@@ -44,9 +44,9 @@ export const isObjectEqual = (a: any, b: any) => {
 export const ImagePairing = (pair: IMAGE_PAIR, img: Partial<AttachmentImg>[]) => {
   return img.reduce((acc, curr) => {
     if (pair[curr.filename])
-      acc.push({ id: pair[curr.filename] })
+      acc[pair[curr.filename]] = ({ id: pair[curr.filename] })
     else
-      acc.push(curr)
+      acc[curr.filename] = curr
     return acc
-  }, [] as Partial<AttachmentImg>[])
+  }, {} as { [key: string]: Partial<AttachmentImg>})
 }

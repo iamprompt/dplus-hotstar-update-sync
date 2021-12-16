@@ -1,5 +1,12 @@
 import type { ATHotstar } from './airtableHotstar'
 
+export type SYNC_CONFIG = {
+  AIRTABLE?: {
+    API_KEY?: string
+    BASE_ID?: string
+  }
+}
+
 export type ASSETS_JSON = {
   // ContentID: AssetFields
   [key: string]: ATHotstar

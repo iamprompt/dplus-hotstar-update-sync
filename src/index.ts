@@ -254,8 +254,6 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
     // }
   }
 
-  writeFileSync(ASSETS_FILE, JSON.stringify(ASSETS, null, 2), { encoding: 'utf8' })
-
   // STEP 4: Compare assets cache file with new assets
   console.log('Updating Airtable data...')
   const AssetsToCreate = Object.entries(ASSETS).reduce((acc, [key, value]) => {
@@ -293,5 +291,6 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
     // console.log(UpdatedAssets)
 
     await updatePoststoAirtable(Object.values(UpdatedAssets))
+    writeFileSync(ASSETS_FILE, JSON.stringify(ASSETS, null, 2), { encoding: 'utf8' })
   }
 })()

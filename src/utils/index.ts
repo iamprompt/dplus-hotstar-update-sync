@@ -4,15 +4,19 @@ import type { IMAGE_PAIR } from '../@types/file'
 
 export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-export const isObjectEqual = (a: any, b: any) => {
+export const isObjectEqual = (a: any, b: any, except: string[] = []) => {
   if (!a || !b) return false
   // Ignore properties that are undefined in both objects
   const aProps = Object.keys(a).filter((key) => a[key] !== undefined)
   const bProps = Object.keys(b).filter((key) => b[key] !== undefined)
 
+  // console.log(aProps, bProps)
+
   if (aProps.length !== bProps.length) return false
 
   for (const prop of aProps) {
+    // console.log(prop)
+    if (except.includes(prop)) continue
     // Array Compare
     if (Array.isArray(a[prop]) && Array.isArray(b[prop])) {
       if (a[prop].length !== b[prop].length) return false
@@ -43,8 +47,9 @@ export const isObjectEqual = (a: any, b: any) => {
 
 export const ImagePairing = (pair: IMAGE_PAIR, img: Partial<AttachmentImg>[]) => {
   return img.reduce((acc, curr) => {
+    // console.log(curr)
     if (pair[curr.filename])
-      acc[pair[curr.filename]] = ({ id: pair[curr.filename] })
+      acc[curr.filename] = ({ id: pair[curr.filename], filename: curr.filename })
     else
       acc[curr.filename] = curr
     return acc

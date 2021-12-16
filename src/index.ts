@@ -67,7 +67,7 @@ const getAssetsAirtable = async () => {
     }
 
     offset = data.offset || undefined
-    await delay(300)
+    await delay(250)
   } while (offset)
 
   return assets
@@ -105,8 +105,21 @@ const updatePoststoAirtable = async (assets: ATHotstar[]) => {
   const airtableFormatted = assets.map((p) => ({ id: ASSETS_PAIR[p.ContentID].recordId, fields: p }))
   if (airtableFormatted.length > 0) {
     do {
-      await AirtableAPI('All Assets').updateRecords(airtableFormatted.splice(0, 10))
-      console.log(`    - Success ${Object.keys(assets).length - airtableFormatted.length}/${Object.keys(assets).length}`)
+      try {
+        const { data } = await AirtableAPI('All Assets').updateRecords<Records<ATHotstar>>(airtableFormatted.splice(0, 10))
+        for (const record of data.records) {
+          ASSETS_PAIR[record.fields.ContentID] = {
+            recordId: record.id,
+            images: record.fields.Images.reduce((acc, img) => {
+              acc[img.filename] = img.id
+              return acc
+            }, {} as IMAGE_PAIR),
+          }
+        }
+        console.log(`    - Success ${Object.keys(assets).length - airtableFormatted.length}/${Object.keys(assets).length}`)
+      } catch (err) {
+        if (axios.isAxiosError(err)) console.error(err.response.data)
+      }
       await delay(250)
     } while (airtableFormatted.length > 0)
   }
@@ -274,18 +287,41 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
 
   if (Object.keys(ASSETS_PAIR).length > 0) {
     const UpdatedAssets = Object.entries(ASSETS).reduce((acc, [key, value]) => {
-      if (OLD_ASSET[key] && !isObjectEqual(OLD_ASSET[key], value)) {
+      // if (value.Title === 'Hawkeye') {
+      //   console.log(key, value)
+      //   console.log(OLD_ASSET[key])
+      //   console.log(isObjectEqual(OLD_ASSET[key], value, ['Images']))
+      // }
+
+      if (OLD_ASSET[key]) {
         const oldImages = ImagePairing(ASSETS_PAIR[key].images, OLD_ASSET[key].Images)
         const newImages = Object.entries(ImagePairing(ASSETS_PAIR[key].images, value.Images)).reduce((acc, [key, value]) => {
-          if (!oldImages[key]) acc[key] = value
+          if (!oldImages[value.filename]) acc.push(value)
           return acc
         }, Object.values(oldImages) as Partial<AttachmentImg>[])
 
-        value.Images = newImages
-        acc[key] = value
+        const imagesEqual = newImages.every(v => {
+          // console.log(oldImages)
+          return !!oldImages[v.filename]
+        })
+
+        // console.log(imagesEqual)
+
+        if (!imagesEqual)
+          value.Images = newImages
+
+        // console.log(isObjectEqual(OLD_ASSET[key], value, ['Images']), imagesEqual)
+
+        // console.log(OLD_ASSET[key], value)
+
+        if (!isObjectEqual(OLD_ASSET[key], value, ['Images']) || !imagesEqual)
+          acc[key] = value
       }
       return acc
     }, {} as ASSETS_JSON)
+
+    // console.log(UpdatedAssets['1770020235'])
+    // console.log(OLD_ASSET['1770020235'])
 
     console.log(`Updated assets: ${Object.keys(UpdatedAssets).length}`)
     // console.log(UpdatedAssets)

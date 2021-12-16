@@ -35,8 +35,8 @@ export const AirtableAPI = (table: string) => {
         }
       )
     },
-    updateRecords: (records: any) =>
-      AirtableInstance.patch(
+    updateRecords<T>(records: any) {
+      return AirtableInstance.patch<T>(
         tableUrl,
         { records, typecast: true },
         {
@@ -44,6 +44,7 @@ export const AirtableAPI = (table: string) => {
             'Content-Type': 'application/json',
           },
         }
-      ),
+      )
+    }
   }
 }

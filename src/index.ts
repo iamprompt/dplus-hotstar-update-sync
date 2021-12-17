@@ -287,32 +287,23 @@ const formatHotstarData = (item: AssetItem): ATHotstar => {
 
   if (Object.keys(ASSETS_PAIR).length > 0) {
     const UpdatedAssets = Object.entries(ASSETS).reduce((acc, [key, value]) => {
-      // if (value.Title === 'Hawkeye') {
-      //   console.log(key, value)
-      //   console.log(OLD_ASSET[key])
-      //   console.log(isObjectEqual(OLD_ASSET[key], value, ['Images']))
-      // }
-
       if (OLD_ASSET[key]) {
         const oldImages = ImagePairing(ASSETS_PAIR[key].images, OLD_ASSET[key].Images)
         const newImages = Object.entries(ImagePairing(ASSETS_PAIR[key].images, value.Images)).reduce((acc, [key, value]) => {
-          if (!oldImages[value.filename]) acc.push(value)
+          if (!oldImages[value.filename]) acc.push({ id: value.id })
           return acc
         }, Object.values(oldImages) as Partial<AttachmentImg>[])
 
         const imagesEqual = newImages.every(v => {
-          // console.log(oldImages)
           return !!oldImages[v.filename]
         })
 
-        // console.log(imagesEqual)
-
-        if (!imagesEqual)
-          value.Images = newImages
-
-        // console.log(isObjectEqual(OLD_ASSET[key], value, ['Images']), imagesEqual)
-
-        // console.log(OLD_ASSET[key], value)
+        if (!imagesEqual) {
+          value.Images = newImages.map(v => {
+            if (v.id) return { id: v.id }
+            else return v
+          })
+        }
 
         if (!isObjectEqual(OLD_ASSET[key], value, ['Images']) || !imagesEqual)
           acc[key] = value
